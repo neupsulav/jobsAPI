@@ -8,13 +8,13 @@ const authRouters = require("./routers/auth");
 const jobsRouters = require("./routers/jobs");
 const connect = require("./db/connect");
 
-// middlewares
-app.use(express.json());
-app.use(noRoute);
-
 //routers
+app.use(express.json());
 app.use("/api/auth", authRouters);
 app.use("/api/jobs", jobsRouters);
+
+// middlewares
+app.use(noRoute);
 
 const listen = async () => {
   try {
