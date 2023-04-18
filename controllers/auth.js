@@ -30,7 +30,6 @@ const login = async (req, res) => {
     }
 
     const user = await User.findOne({ email });
-    console.log(user);
 
     if (!user) {
       return res.status(500).json({ msg: "Invalid user credentials" });
@@ -45,7 +44,6 @@ const login = async (req, res) => {
 
     // generating token
     const token = user.getJWT();
-    console.log(token);
 
     res.status(200).json({ msg: "User logged in", token: token });
   } catch (error) {
