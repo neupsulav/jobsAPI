@@ -46,12 +46,48 @@ const createJob = async (req, res) => {
   }
 };
 
+// update job
 const updateJob = async (req, res) => {
-  res.status(200).send("Register user");
+  try {
+    const createdBy = req.user.userId;
+    const jobId = req.params.id;
+
+    const job = await Job.findByIdAndUpdate(
+      { _id: jobId, createdBy: createdBy },
+      req.body,
+      { new: true, runValidators: true }
+    );
+
+    if (!job) {
+      return res.status(404).json({ msg: "job not found" });
+    }
+
+    res.status(200).json({ job });
+  } catch (error) {
+    res.status(500).send(error);
+    console.log(error);
+  }
 };
 
+// delete job
 const deleteJob = async (req, res) => {
-  res.status(200).send("Register user");
+  try {
+    const jobId = req.params.id;
+    const createdBy = req.user.userId;
+
+    const job = await Job.findByIdAndRemove({
+      _id: jobId,
+      createdBy: createdBy,
+    });
+
+    if (!job) {
+      res.status(404).json({ msg: `No any job found with id ${jobId}` });
+    }
+
+    res.status(200).json({ msg: "the following job is removed", job });
+  } catch (error) {
+    res.status(500).send(error);
+  }
 };
 
 module.exports = {
