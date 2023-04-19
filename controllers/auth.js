@@ -1,55 +1,47 @@
 const User = require("../models/user");
+const catchAsync = require("../middlewares/catchAsync");
+const ErrorHandler = require("../middlewares/errorHandler");
 
-const register = async (req, res) => {
-  try {
-    const { name, password, email } = req.body;
+const register = catchAsync(async (req, res, next) => {
+  const { name, password, email } = req.body;
 
-    if (!name || !password || !email) {
-      return res
-        .status(500)
-        .json({ msg: "Please fill all the fields properly" });
-    }
-
-    const newUser = await User.create({ name, password, email });
-    newUser.save();
-
-    const token = await newUser.getJWT();
-
-    res.status(200).json({ name: newUser.name, token: token });
-  } catch (error) {
-    res.status(500).send(error);
+  if (!name || !password || !email) {
+    return next(new ErrorHandler("Please fill all the fields properly", 500));
   }
-};
 
-const login = async (req, res) => {
-  try {
-    const { email, password } = req.body;
+  const newUser = await User.create({ name, password, email });
+  newUser.save();
 
-    if (!email || !password) {
-      return res.status(500).json({ msg: "Please fill all the credentials" });
-    }
+  const token = await newUser.getJWT();
 
-    const user = await User.findOne({ email });
+  res.status(200).json({ name: newUser.name, token: token });
+});
 
-    if (!user) {
-      return res.status(500).json({ msg: "Invalid user credentials" });
-    }
+const login = catchAsync(async (req, res, next) => {
+  const { email, password } = req.body;
 
-    //compare password
-    const isPasswordCorrect = await user.comparePassword(password);
-
-    if (!isPasswordCorrect) {
-      return res.status(500).json({ msg: "Invalid user credentials" });
-    }
-
-    // generating token
-    const token = user.getJWT();
-
-    res.status(200).json({ msg: "User logged in", token: token });
-  } catch (error) {
-    console.log(error);
+  if (!email || !password) {
+    return next(new ErrorHandler("Please fill all the credentials", 500));
   }
-};
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return next(new ErrorHandler("Invalid user credentials", 500));
+  }
+
+  //compare password
+  const isPasswordCorrect = await user.comparePassword(password);
+
+  if (!isPasswordCorrect) {
+    return next(new ErrorHandler("Invalid user credentials", 500));
+  }
+
+  // generating token
+  const token = user.getJWT();
+
+  res.status(200).json({ msg: "User logged in", token: token });
+});
 
 module.exports = {
   register,

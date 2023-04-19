@@ -7,6 +7,7 @@ const noRoute = require("./middlewares/noRoute");
 const authRouters = require("./routers/auth");
 const jobsRouters = require("./routers/jobs");
 const connect = require("./db/connect");
+const errorHandlerMiddleware = require("./middlewares/ErrorHandlerMiddleware");
 
 // authentication middleware
 const authenticateUser = require("./middlewares/authentication");
@@ -18,6 +19,9 @@ app.use("/api/jobs", authenticateUser, jobsRouters);
 
 // middlewares
 app.use(noRoute);
+
+// error handler middleware
+app.use(errorHandlerMiddleware);
 
 const listen = async () => {
   try {
