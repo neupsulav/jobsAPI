@@ -9,13 +9,10 @@ const jobsRouters = require("./routers/jobs");
 const connect = require("./db/connect");
 const errorHandlerMiddleware = require("./middlewares/ErrorHandlerMiddleware");
 
-// authentication middleware
-const authenticateUser = require("./middlewares/authentication");
-
 //routers
 app.use(express.json());
 app.use("/api/auth", authRouters);
-app.use("/api/jobs", authenticateUser, jobsRouters);
+app.use("/api/jobs", jobsRouters);
 
 // middlewares
 app.use(noRoute);
